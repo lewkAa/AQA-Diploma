@@ -40,3 +40,4 @@ out/
 *.tar.gz
 *.rar
 /src/resources/
+/Progress.md
