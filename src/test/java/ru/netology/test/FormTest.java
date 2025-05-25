@@ -85,7 +85,7 @@ public class FormTest {
     @Test
     @DisplayName("Should get error when send form with empty field 'cvv'")
     void shouldErrorWithEmptyCvvField() {
-        var card = DataHelper.genCard(APPROVED_CARD); // Генерируем карту без номера
+        var card = DataHelper.genCard(APPROVED_CARD);
         card.setCvc("");
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
@@ -95,7 +95,7 @@ public class FormTest {
     @Test
     @DisplayName("Should get error when send form with empty field 'holder'")
     void shouldErrorWithEmptyHolderField() {
-        var card = DataHelper.genCard(APPROVED_CARD); // Генерируем карту без номера
+        var card = DataHelper.genCard(APPROVED_CARD);
         card.setHolder("");
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
@@ -105,7 +105,7 @@ public class FormTest {
     @Test
     @DisplayName("Should get error when send form with empty field 'month'")
     void shouldErrorWithEmptyMonthField() {
-        var card = DataHelper.genCard(APPROVED_CARD); // Генерируем карту без номера
+        var card = DataHelper.genCard(APPROVED_CARD);
         card.setMonth("");
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
@@ -115,7 +115,7 @@ public class FormTest {
     @Test
     @DisplayName("Should get error when send form with empty field 'Year'")
     void shouldErrorWithEmptyYearField() {
-        var card = DataHelper.genCard(APPROVED_CARD); // Генерируем карту без номера
+        var card = DataHelper.genCard(APPROVED_CARD);
         card.setYear("");
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
