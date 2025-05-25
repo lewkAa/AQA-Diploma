@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Card {
-        private String number;
-        private String year;
-        private String month;
-        private String holder;
-        private String cvc;
-    }
+    private String number;
+    private String year;
+    private String month;
+    private String holder;
+    private String cvc;
+}
 

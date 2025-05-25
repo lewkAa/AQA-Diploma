@@ -51,7 +51,6 @@ public class FormTest {
     }
 
 
-
     @Test
     @DisplayName("Failed buy with DECLINED Card")
     void shouldFailWithDeclinedCard() {
@@ -325,7 +324,7 @@ public class FormTest {
     void shouldNotInputDigitsInHolderField() {
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.noInputCheck("holder", DataHelper.genDigits(1,10));
+        buyPg.noInputCheck("holder", DataHelper.genDigits(1, 10));
     }
 
     @Test
@@ -399,7 +398,8 @@ public class FormTest {
     @DisplayName("Success buy with APPROVED Card via API (NoSetup)")
     void shouldSuccessWithApprovedCardApi() {
         ApiHelper.successSend(DataHelper.genCard(APPROVED_CARD));
-        assertEquals("APPROVED", SQLHelper.getStatus());;
+        assertEquals("APPROVED", SQLHelper.getStatus());
+        ;
     }
 
     @Test
@@ -420,7 +420,7 @@ public class FormTest {
     @DisplayName("Should respond 'Bad request' with  too long 'year' API (NoSetup)")
     void shouldFailWithLongYearApi() {
         var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genDigits(3,8));
+        card.setYear(DataHelper.genDigits(3, 8));
         ApiHelper.sendCard(card);
     }
 
@@ -428,7 +428,7 @@ public class FormTest {
     @DisplayName("Should respond 'Bad request' with too short 'year' API (NoSetup)")
     void shouldFailWithShortYearApi() {
         var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genDigits(1,1));
+        card.setYear(DataHelper.genDigits(1, 1));
         ApiHelper.sendCard(card);
     }
 
@@ -444,7 +444,7 @@ public class FormTest {
     @DisplayName("Should respond 'Bad request' with latin chars in 'year' API (NoSetup)")
     void shouldFailWithLatinCharYearApi() {
         var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genLatinStr(2,2));
+        card.setYear(DataHelper.genLatinStr(2, 2));
         ApiHelper.sendCard(card);
     }
 
@@ -460,7 +460,7 @@ public class FormTest {
     @DisplayName("Should respond 'Bad request' with  too long 'month' API (NoSetup)")
     void shouldFailWithLongMonthApi() {
         var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth(DataHelper.genDigits(3,8));
+        card.setMonth(DataHelper.genDigits(3, 8));
         ApiHelper.sendCard(card);
     }
 
@@ -468,7 +468,7 @@ public class FormTest {
     @DisplayName("Should respond 'Bad request' with too short 'month' API (NoSetup)")
     void shouldFailWithShortMonthApi() {
         var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth(DataHelper.genDigits(1,1));
+        card.setMonth(DataHelper.genDigits(1, 1));
         ApiHelper.sendCard(card);
     }
 
@@ -484,7 +484,7 @@ public class FormTest {
     @DisplayName("Should respond 'Bad request' with latin chars in 'month' API (NoSetup)")
     void shouldFailWithLatinCharMonthApi() {
         var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth(DataHelper.genLatinStr(2,2));
+        card.setMonth(DataHelper.genLatinStr(2, 2));
         ApiHelper.sendCard(card);
     }
 
@@ -524,7 +524,7 @@ public class FormTest {
     @DisplayName("Should respond 'Bad request' with latin chars in 'сvc' API (NoSetup)")
     void shouldFailWithLatinCharCvcApi() {
         var card = DataHelper.genCard(APPROVED_CARD);
-        card.setCvc(DataHelper.genLatinStr(2,2));
+        card.setCvc(DataHelper.genLatinStr(2, 2));
         ApiHelper.sendCard(card);
     }
 
@@ -544,7 +544,6 @@ public class FormTest {
         ApiHelper.failSend(card);
         assertEquals("DECLINED", SQLHelper.getStatus());
     }
-
 
 
 }

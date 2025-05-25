@@ -8,7 +8,6 @@ import java.util.Map;
 
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.sleep;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
@@ -103,9 +102,10 @@ public class BuyPage {
         sendButton.click();
         errorCheck();
     }
+
     /* В этих проверках пришлось сделать столько задержек, поскольку тесты ловили баг через-раз*/
     private void errorCheck() {
-        errorMsg.shouldBe(visible,Duration.ofSeconds(10) )
+        errorMsg.shouldBe(visible, Duration.ofSeconds(10))
                 .shouldHave(text("Ошибка! Банк отказал в проведении операции."), Duration.ofSeconds(2));
         errorClose.click();
         errorMsg.shouldNotBe(visible, Duration.ofSeconds(2));
@@ -114,7 +114,7 @@ public class BuyPage {
 
     private void successCheck() {
         successMsg.should(visible, Duration.ofSeconds(10))
-                .shouldHave(text("Операция одобрена Банком."),Duration.ofSeconds(2));
+                .shouldHave(text("Операция одобрена Банком."), Duration.ofSeconds(2));
         successClose.click();
         successMsg.shouldNotBe(visible, Duration.ofSeconds(2));
         errorMsg.shouldNotBe(visible, Duration.ofSeconds(2));
