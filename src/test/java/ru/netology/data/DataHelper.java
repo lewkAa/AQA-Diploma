@@ -1,9 +1,11 @@
 package ru.netology.data;
 
 import com.github.javafaker.Faker;
+import lombok.Value;
 
 import java.time.LocalDate;
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Random;
 
@@ -11,15 +13,30 @@ public class DataHelper {
 
     private static final Faker faker = new Faker();
 
+    @Value
+    public static class Card {
+        private String number;
+        private String year;
+        private String month;
+        private String holder;
+        private String cvc;
+    }
+
+    @Value
+    public static class Date {
+        private String year;
+        private String month;
+    }
+
 
     public static Card genCard(String cardNum) {
-        Card newCard = new Card();
-        newCard.setNumber(cardNum);
-        newCard.setHolder(genValidHolder());
-        String validYear = DataHelper.genValidYear();
-        newCard.setYear(validYear);
-        newCard.setMonth(genValidMonth(validYear));
-        newCard.setCvc(genValidCVC());
+        Date date = genDate(true);
+        Card newCard = new Card(
+                cardNum,
+                date.getYear(),
+                date.getMonth(),
+                genValidHolder(),
+                genValidCVC());
         return newCard;
     }
 
@@ -40,43 +57,25 @@ public class DataHelper {
         return longCard.replaceAll("(.{4})", "$1 ").trim();
     }
 
+    public static Date genDate(boolean future) {
+        int minMonths = future ? 0 : -72;
+        int maxMonths = future ? 72 : -1;
 
-    public static String genValidYear() {
-        int currentYear = Year.now().getValue() % 100;
-        int maxFutureYear = currentYear + 5;
-        int year = faker.number().numberBetween(currentYear, maxFutureYear + 1);
-        return String.format("%02d", year);
+        int randomMonth = faker.number().numberBetween(minMonths, maxMonths);
+        LocalDate validDate = LocalDate.now().plusMonths(randomMonth);
+
+        return new Date(
+                validDate.format(DateTimeFormatter.ofPattern("yy")),
+                validDate.format(DateTimeFormatter.ofPattern("MM"))
+        );
     }
 
-    public static String genOutdateYear() {
-        int currentYear = Year.now().getValue() % 100;
-        int maxBackYear = currentYear - 10;
-        int year = faker.number().numberBetween(maxBackYear, currentYear);
-        return String.format("%02d", year);
-    }
 
     public static String getCurrYear() {
         int year = Year.now().getValue() % 100;
         return String.format("%02d", year);
     }
 
-
-    public static String genValidMonth(String year) {
-        int currentYear = Year.now().getValue() % 100;
-        int currentMonth = LocalDate.now().getMonthValue();
-        ;
-        int givenYear = Integer.parseInt(year);
-        int month;
-        if (givenYear < currentYear) {
-            throw new IllegalArgumentException("Year cannot be in the past");
-        }
-        if (givenYear > currentYear) {
-            month = faker.number().numberBetween(1, 13);
-        } else {
-            month = faker.number().numberBetween(currentMonth, 13);
-        }
-        return String.format("%02d", month);
-    }
 
     public static String genInvalidMonth() {
         int currentMonth = LocalDate.now().getMonthValue();

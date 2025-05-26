@@ -18,7 +18,7 @@ public class ApiHelper {
             .setContentType(ContentType.JSON)
             .log(LogDetail.ALL).build();
 
-    public static void successSend(Card card) {
+    public static void successSend(DataHelper.Card card) {
 
         given()
                 .spec(requestSpec)
@@ -30,7 +30,7 @@ public class ApiHelper {
                 .body("status", equalTo("APPROVED"));
     }
 
-    public static void failSend(Card card) {
+    public static void failSend(DataHelper.Card card) {
 
         given()
                 .spec(requestSpec)
@@ -38,11 +38,11 @@ public class ApiHelper {
                 .when()
                 .post("/api/v1/pay")
                 .then()
-                .statusCode(200)
+                .statusCode(400)
                 .body("status", equalTo("DECLINED"));
     }
 
-    public static void sendCard(Card card) {
+    public static void sendCard(DataHelper.Card card) {
 
         given()
                 .spec(requestSpec)

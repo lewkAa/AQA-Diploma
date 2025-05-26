@@ -45,7 +45,8 @@ public class FormTest {
         var card = DataHelper.genCard(APPROVED_CARD);
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.validBuy(card);
+        buyPg.formFill(card);
+        buyPg.errorCheck(true);
 
         assertEquals("APPROVED", SQLHelper.getStatus()); // Проверка записи в БД.
     }
@@ -57,7 +58,8 @@ public class FormTest {
         var card = DataHelper.genCard(DECLINED_CARD);
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.invalidBuy(card);
+        buyPg.formFill(card);
+        buyPg.errorCheck(false);
 
         assertEquals("DECLINED", SQLHelper.getStatus()); // Проверка записи в БД.
     }
@@ -68,7 +70,8 @@ public class FormTest {
         var card = DataHelper.genCard(DataHelper.genRndCardNum());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.invalidBuy(card);
+        buyPg.formFill(card);
+        buyPg.errorCheck(false);
     }
 
 
@@ -78,47 +81,59 @@ public class FormTest {
         var card = DataHelper.genCard(""); // Генерируем карту без номера
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.emptyFieldCheck(card, "numberSub");
+        buyPg.fieldErrorCheck(card, "numberSub", "empty");
     }
 
     @Test
     @DisplayName("Should get error when send form with empty field 'cvv'")
     void shouldErrorWithEmptyCvvField() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setCvc("");
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), date.getMonth(),
+                DataHelper.genValidHolder(), "");
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.emptyFieldCheck(card, "cvvSub");
+        buyPg.fieldErrorCheck(card, "cvvSub", "empty");
     }
 
     @Test
     @DisplayName("Should get error when send form with empty field 'holder'")
     void shouldErrorWithEmptyHolderField() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setHolder("");
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), date.getMonth(),
+                "", DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.emptyFieldCheck(card, "holderSub");
+        buyPg.fieldErrorCheck(card, "holderSub", "empty");
     }
 
     @Test
     @DisplayName("Should get error when send form with empty field 'month'")
     void shouldErrorWithEmptyMonthField() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth("");
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), "",
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.emptyFieldCheck(card, "monthSub");
+        buyPg.fieldErrorCheck(card, "monthSub", "empty");
     }
 
     @Test
     @DisplayName("Should get error when send form with empty field 'Year'")
     void shouldErrorWithEmptyYearField() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear("");
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                "", date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.emptyFieldCheck(card, "yearSub");
+        buyPg.fieldErrorCheck(card, "yearSub", "empty");
     }
 
     @Test
@@ -127,16 +142,15 @@ public class FormTest {
         var card = DataHelper.genCard(DataHelper.genShortCardNum());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.badFormatCheck(card, "numberSub");
+        buyPg.fieldErrorCheck(card, "numberSub", "format");
     }
 
     @Test
     @DisplayName("Should not input digits above max in field 'number'")
     void shouldNoExtraInputWithLongNumber() {
-        var card = DataHelper.genCard(DataHelper.genLongCardNum());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.lengthCheck(card, "number", "numberSub", 19);
+        buyPg.extraInputCheck("number", DataHelper.genLongCardNum(), 19);
     }
 
     @Test
@@ -166,32 +180,41 @@ public class FormTest {
     @Test
     @DisplayName("Should get error when send form with invalid field 'month'")
     void shouldErrorWithInvalidMonthField() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth(DataHelper.genNumber(13, 99));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genNumber(13, 99),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.monthInvalidCheck(card);
+        buyPg.fieldErrorCheck(card, "monthSub", "expiration");
     }
 
     @Test
     @DisplayName("Should get error when send form with '0'' in field 'month'")
     void shouldErrorWithZeroInMonth() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth("0");
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), "0",
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.badFormatCheck(card, "monthSub");
+        buyPg.fieldErrorCheck(card, "monthSub", "format");
 
     }
 
     @Test
     @DisplayName("Should get error when send form with bad format in field 'month'")
     void shouldErrorWithBadFormatMonth() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth(DataHelper.genNumber(0, 9));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genNumber(0, 9),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.badFormatCheck(card, "monthSub");
+        buyPg.fieldErrorCheck(card, "monthSub", "format");
 
     }
 
@@ -222,22 +245,28 @@ public class FormTest {
     @Test
     @DisplayName("Should get error when send form with '0'' in field 'year'")
     void shouldErrorWithZeroInYear() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear("0");
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                "0", date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.badFormatCheck(card, "yearSub");
+        buyPg.fieldErrorCheck(card, "yearSub", "format");
 
     }
 
     @Test
     @DisplayName("Should get error when send form with bad format in field 'year'")
     void shouldErrorWithBadFormatYear() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genNumber(0, 9));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                DataHelper.genNumber(0, 9), date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.badFormatCheck(card, "yearSub");
+        buyPg.fieldErrorCheck(card, "yearSub", "format");
 
     }
 
@@ -268,47 +297,49 @@ public class FormTest {
     @Test
     @DisplayName("Should get error when send form with outdated in field 'year'")
     void shouldErrorWithOutdatedYear() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genOutdateYear());
+        var date = DataHelper.genDate(false);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.yearInvalidCheck(card);
+        buyPg.fieldErrorCheck(card, "yearSub", "outdated");
 
     }
 
     @Test
     @DisplayName("Should get error when send form with outdated in field 'month'")
     void shouldErrorWithOutdatedMonth() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.getCurrYear());
-        card.setMonth(DataHelper.genInvalidMonth());
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                DataHelper.getCurrYear(), DataHelper.genInvalidMonth(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.monthInvalidCheck(card);
-       /*Надо сказать, что данный тест не сработает, если сейчас текущий месяц январь.
-        Этот тест в принципе невозможно провести в январе, поскольку условие выдачи ошибки это текущий год +
-        прошедший месяц.*/
+        buyPg.fieldErrorCheck(card, "monthSub", "expiration");
     }
 
     @Test
     @DisplayName("Should get error when send form with value below min length in field 'holder'")
     void shouldErrorWithTooShortYHolder() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setHolder(DataHelper.genLatinStr(1, 1));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), date.getMonth(),
+                DataHelper.genLatinStr(1, 1), DataHelper.genValidCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.badFormatCheck(card, "holderSub");
+        buyPg.fieldErrorCheck(card, "holderSub", "format");
 
     }
 
     @Test
     @DisplayName("Should not input value above max length in field 'holder'")
     void shouldNoExtraInputLongHolder() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setHolder(DataHelper.genLatinStr(31, 50));
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.lengthCheck(card, "holder", "holderSub", 30);
+        buyPg.extraInputCheck("holder", DataHelper.genLatinStr(31, 50), 19);
     }
 
     @Test
@@ -338,34 +369,43 @@ public class FormTest {
     @Test
     @DisplayName("Should get error when send form with '0'' in field 'CVV'")
     void shouldErrorWithZeroInCVV() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setCvc("0");
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), date.getMonth(),
+                DataHelper.genValidHolder(), "0");
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.badFormatCheck(card, "cvvSub");
+        buyPg.fieldErrorCheck(card, "cvvSub", "format");
 
     }
 
     @Test
     @DisplayName("Should get error when send form with short value in field 'CVV'")
     void shouldErrorWithShortCVV() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setCvc(DataHelper.genShortCVC());
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genShortCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.badFormatCheck(card, "cvvSub");
+        buyPg.fieldErrorCheck(card, "cvvSub", "format");
 
     }
 
     @Test
     @DisplayName("Should not input value above max length in field 'CVV'")
     void shouldNotInputExtraLongCVV() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setCvc(DataHelper.genLongCVC());
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genLongCVC());
         var startPg = new StartPage();
         var buyPg = startPg.clickBuy();
-        buyPg.lengthCheck(card, "cvv", "cvvSub", 3);
-        ;
+        buyPg.extraInputCheck("cvv", DataHelper.genLatinStr(4, 10), 3);
+
     }
 
     @Test
@@ -419,128 +459,176 @@ public class FormTest {
     @Test
     @DisplayName("Should respond 'Bad request' with  too long 'year' API (NoSetup)")
     void shouldFailWithLongYearApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genDigits(3, 8));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                DataHelper.genDigits(3, 8), date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with too short 'year' API (NoSetup)")
     void shouldFailWithShortYearApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genDigits(1, 1));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                DataHelper.genDigits(1, 1), date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with special chars in 'year' API (NoSetup)")
     void shouldFailWithSpecCharYearApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genSpeсChars());
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                DataHelper.genSpeсChars(), date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with latin chars in 'year' API (NoSetup)")
     void shouldFailWithLatinCharYearApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genLatinStr(2, 2));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                DataHelper.genLatinStr(2, 2), date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with cirill chars in 'year' API (NoSetup)")
     void shouldFailWithCirillCharYearApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genCyrillStr());
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                DataHelper.genCyrillStr(), date.getMonth(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with  too long 'month' API (NoSetup)")
     void shouldFailWithLongMonthApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth(DataHelper.genDigits(3, 8));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genDigits(3, 8),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with too short 'month' API (NoSetup)")
     void shouldFailWithShortMonthApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth(DataHelper.genDigits(1, 1));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genDigits(1, 1),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with special chars in 'month' API (NoSetup)")
     void shouldFailWithSpecCharMonthApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genSpeсChars());
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genSpeсChars(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with latin chars in 'month' API (NoSetup)")
     void shouldFailWithLatinCharMonthApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth(DataHelper.genLatinStr(2, 2));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genLatinStr(2, 2),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with cirill chars in 'month' API (NoSetup)")
     void shouldFailWithCirillCharMonthApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setMonth(DataHelper.genCyrillStr());
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genCyrillStr(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with  too long 'cvc' API (NoSetup)")
     void shouldFailWithLongCvcApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setCvc(DataHelper.genLongCVC());
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genCyrillStr(),
+                DataHelper.genValidHolder(), DataHelper.genLongCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with too short 'сvc' API (NoSetup)")
     void shouldFailWithShortCvcApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setCvc(DataHelper.genShortCVC());
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genCyrillStr(),
+                DataHelper.genValidHolder(), DataHelper.genShortCVC());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with special chars in 'сvc' API (NoSetup)")
     void shouldFailWithSpecCharCvcApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setCvc(DataHelper.genSpeсChars());
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genCyrillStr(),
+                DataHelper.genValidHolder(), DataHelper.genSpeсChars());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with latin chars in 'сvc' API (NoSetup)")
     void shouldFailWithLatinCharCvcApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setCvc(DataHelper.genLatinStr(2, 2));
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genCyrillStr(),
+                DataHelper.genValidHolder(), DataHelper.genLatinStr(2, 2));
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should respond 'Bad request' with cirill chars in 'сvc' API (NoSetup)")
     void shouldFailWithCirillCharCvcApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setCvc(DataHelper.genCyrillStr());
+        var date = DataHelper.genDate(true);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genCyrillStr(),
+                DataHelper.genValidHolder(), DataHelper.genCyrillStr());
         ApiHelper.sendCard(card);
     }
 
     @Test
     @DisplayName("Should decline with APPROVED Card and outdated 'year' via API (NoSetup)")
     void shouldFailWithApprovedCardAndBadYearApi() {
-        var card = DataHelper.genCard(APPROVED_CARD);
-        card.setYear(DataHelper.genOutdateYear());
+        var date = DataHelper.genDate(false);
+        var card = new DataHelper.Card(
+                APPROVED_CARD,
+                date.getYear(), DataHelper.genCyrillStr(),
+                DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.failSend(card);
         assertEquals("DECLINED", SQLHelper.getStatus());
     }

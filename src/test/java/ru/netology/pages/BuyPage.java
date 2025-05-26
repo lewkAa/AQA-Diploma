@@ -1,14 +1,13 @@
 package ru.netology.pages;
 
 import com.codeborne.selenide.SelenideElement;
-import ru.netology.data.Card;
+import ru.netology.data.DataHelper;
 
 import java.time.Duration;
 import java.util.Map;
 
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
 public class BuyPage {
@@ -25,14 +24,23 @@ public class BuyPage {
     private SelenideElement cvvSub = cvv.parent().sibling(0);
     private SelenideElement holderSub = holder.parent().sibling(0);
 
-    private SelenideElement successMsg = $("div.notification_status_ok");
-    private SelenideElement errorMsg = $("div.notification_status_error");
-    private SelenideElement errorClose = errorMsg.$(".icon_name_close");
-    private SelenideElement successClose = successMsg.$(".icon_name_close");
+    private SelenideElement success = $("div.notification_status_ok");
+    private SelenideElement fail = $("div.notification_status_error");
+    private SelenideElement failX = fail.$(".icon_name_close");
+    private SelenideElement successX = success.$(".icon_name_close");
 
     Map<String, SelenideElement> elements = Map.of("numberSub", numberSub, "monthSub", monthSub,
             "yearSub", yearSub, "holderSub", holderSub, "cvvSub", cvvSub, "number", number,
             "month", month, "year", year, "cvv", cvv, "holder", holder);
+
+    Map<String, String> messages = Map.of(
+            "format", "Неверный формат",
+            "empty", "Поле обязательно для заполнения",
+            "outdated", "Истёк срок действия карты",
+            "expiration", "Неверно указан срок действия карты",
+            "fail", "Ошибка! Банк отказал в проведении операции.",
+            "success", "Операция одобрена Банком.");
+
 
     public BuyPage() {
         SelenideElement[] elementsToVerify = {number, month, year, cvv, holder, sendButton};
@@ -41,82 +49,45 @@ public class BuyPage {
         }
     }
 
-
-    public void formFill(Card card) {
+    public void formFill(DataHelper.Card card) {
         number.setValue(card.getNumber());
         month.setValue(card.getMonth());
         year.setValue(card.getYear());
         cvv.setValue(card.getCvc());
         holder.setValue(card.getHolder());
+        sendButton.click();
     }
 
-    public void emptyFieldCheck(Card card, String fieldSub) {
+    public void fieldErrorCheck(DataHelper.Card card, String fieldSub, String msgType) {
         formFill(card);
-        sendButton.click();
         elements.get(fieldSub)
-                .shouldBe(visible)
-                .shouldHave(text("Поле обязательно для заполнения"));
+                .shouldBe(visible).shouldHave(text(messages.get(msgType)));
     }
 
-    public void badFormatCheck(Card card, String fieldSub) {
-        formFill(card);
-        sendButton.click();
-        elements.get(fieldSub)
-                .shouldBe(visible).shouldHave(text("Неверный формат"));
-    }
 
     public void noInputCheck(String field, String input) {
-        elements.get(field).setValue(input)
-                .shouldBe(empty);
+        elements.get(field).setValue(input).shouldBe(empty);
     }
 
-    public void lengthCheck(Card card, String field, String fieldSub, int maxLength) {
-        formFill(card);
-        int fieldValue = elements.get(field).shouldHave((attribute("value"))).getValue().length();
-        assertThat(fieldValue).isNotNull().isEqualTo(maxLength);
-        sendButton.click();
-        elements.get(fieldSub)
-                .shouldNot(visible);
+    public void extraInputCheck(String field, String input, int maxLength) {
+        String expectedValue = input.substring(0, Math.min(input.length(), maxLength));
+        elements.get(field)
+                .setValue(input)
+                .shouldHave(value(expectedValue));
     }
 
-    public void monthInvalidCheck(Card card) {
-        formFill(card);
-        sendButton.click();
-        monthSub.shouldBe(visible).shouldHave(text("Неверно указан срок действия карты"));
+
+    public void errorCheck(boolean isSuccess) {
+        SelenideElement message = isSuccess ? success : fail;
+        SelenideElement oppositeMessage = isSuccess ? fail : success;
+        SelenideElement closeButton = isSuccess ? successX : failX;
+        String messageKey = isSuccess ? "success" : "fail";
+
+        message.shouldBe(visible, Duration.ofSeconds(10))
+                .shouldHave(text(messages.get(messageKey)), Duration.ofSeconds(2));
+        closeButton.click();
+        message.shouldNotBe(visible, Duration.ofSeconds(2));
+        oppositeMessage.shouldNotBe(visible, Duration.ofSeconds(2));
     }
 
-    public void yearInvalidCheck(Card card) {
-        formFill(card);
-        sendButton.click();
-        yearSub.shouldBe(visible).shouldHave(text("Истёк срок действия карты"));
-    }
-
-    public void validBuy(Card card) {
-        formFill(card);
-        sendButton.click();
-        successCheck();
-    }
-
-    public void invalidBuy(Card card) {
-        formFill(card);
-        sendButton.click();
-        errorCheck();
-    }
-
-    /* В этих проверках пришлось сделать столько задержек, поскольку тесты ловили баг через-раз*/
-    private void errorCheck() {
-        errorMsg.shouldBe(visible, Duration.ofSeconds(10))
-                .shouldHave(text("Ошибка! Банк отказал в проведении операции."), Duration.ofSeconds(2));
-        errorClose.click();
-        errorMsg.shouldNotBe(visible, Duration.ofSeconds(2));
-        successMsg.shouldNotBe(visible, Duration.ofSeconds(2));
-    }
-
-    private void successCheck() {
-        successMsg.should(visible, Duration.ofSeconds(10))
-                .shouldHave(text("Операция одобрена Банком."), Duration.ofSeconds(2));
-        successClose.click();
-        successMsg.shouldNotBe(visible, Duration.ofSeconds(2));
-        errorMsg.shouldNotBe(visible, Duration.ofSeconds(2));
-    }
 }

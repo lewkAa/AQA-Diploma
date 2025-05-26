@@ -6,8 +6,8 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 public class StartPage {
-    SelenideElement  buyButton = $("button:not(.button_view_extra)");
-    SelenideElement  creditButton = $("button.button_view_extra");
+    SelenideElement buyButton = $("button:not(.button_view_extra)");
+    SelenideElement creditButton = $("button.button_view_extra");
 
     public StartPage() {
         buyButton.shouldBe(visible);
@@ -17,10 +17,6 @@ public class StartPage {
     public BuyPage clickBuy() {
         buyButton.click();
         return new BuyPage();
-    }
-
-    public void clickCredit() {
-        creditButton.click();
     }
 }
 
