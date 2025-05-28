@@ -23,12 +23,25 @@
 - [Issue #11](https://github.com/lewkAa/AQA-Diploma/issues/11#issue-3096841993)
 - [Issue #12](https://github.com/lewkAa/AQA-Diploma/issues/12#issue-3096901639)
 
-### Критические проблемы
+### Существенные проблемы проблемы
 - **Валидация поля "Владелец"**  
-  Необходимо срочно добавить валидацию на стороне frontend и backend ([Issue #1](https://github.com/lewkAa/AQA-Diploma/issues/1#issue-3080797538)).  
+  Необходимо в срочном порядке проверить валидацию на стороне frontend и backend ([Issue #1](https://github.com/lewkAa/AQA-Diploma/issues/1#issue-3080797538)).
   **Риски:**
-    - Некорректные данные попадают в БД.
-    - Потенциальная уязвимость для SQL-инъекций или XSS-атак.
+  - Некорректные данные попадают в БД.
+  - Потенциальная уязвимость для SQL-инъекций или XSS-атак.
+- **Нарушена логика валидации на backend** ([Issue #1](https://github.com/lewkAa/AQA-Diploma/issues/1#issue-3080797538),[Issue #10](https://github.com/lewkAa/AQA-Diploma/issues/10#issue-3096800480),
+[Issue #11](https://github.com/lewkAa/AQA-Diploma/issues/11#issue-3096841993),[Issue #12](https://github.com/lewkAa/AQA-Diploma/issues/12#issue-3096901639))<br/>
+  Backend пропускает большое количество невалидных данных, что в свою очередь несет разнообразные риски
+ **Риски:**:
+   - **SQL-инъекции**
+   - **XSS-атаки**
+   - **Подмена параметров**
+   - **Мусор в БД**
+   - **Нарушение связей**
+   - **Некорректная обработка**
+   - **Падение сервиса**
+   - **Хранение запрещённых данных**(персональные данные без согласия)  
+  
 
 ### Улучшения
 - **Тестовые метки**  
