@@ -1,3 +1,4 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/8dvl11p63n4lcsx6/branch/main?svg=true)](https://ci.appveyor.com/project/lewkAa/aqa-diploma/branch/main)
 # Тестирование веб-формы покупки тура
 
 
