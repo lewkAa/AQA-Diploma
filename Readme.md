@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/8dvl11p63n4lcsx6/branch/main?svg=true)](https://ci.appveyor.com/project/lewkAa/aqa-diploma/branch/main)
+[![Java CI with Gradle](https://github.com/lewkAa/AQA-Diploma/actions/workflows/gradle.yml/badge.svg)](https://github.com/lewkAa/AQA-Diploma/actions/workflows/gradle.yml)
 # Тестирование веб-формы покупки тура
 
 
