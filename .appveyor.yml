@@ -6,15 +6,16 @@ branches:
   only:
     - main  # ветка git
 
-build: off  # будем использовать свой скрипт сборки
+build:
+  jobs:
+    - script:
+        - docker compose up
 
 install:
   # Запускаем SUT,
   # имя файла SUT будет отличаться в каждой задаче.
   # & означает, что в фоновом режиме не блокируем терминал для запуска тестов,
   # обязательно должен быть для запуска SUT в CI
-
-  - hoverkraft-tech/compose-action@v2.0.1
   - sleep 30
   - chmod +x gradlew
   - java -jar ./artifacts/aqa-shop.jar -P:jdbc.url="jdbc:mysql://localhost:3306/app" -P:jdbc.user="app" -P:jdbc.password="pass" &
