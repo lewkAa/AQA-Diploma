@@ -45,5 +45,4 @@
 ## Интеграция с системами отчётности
 Приложены автоматизированные отчёты:
 
-- [Gradle Report](../build/reports/tests/test/index.html)
-- [Allure Report](../allure-report/index.html)
+- [Allure Report](https://github.com/user-attachments/assets/6dcb322c-bf2b-467c-b67d-ef665813d37f)
