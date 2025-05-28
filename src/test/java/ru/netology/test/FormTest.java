@@ -572,7 +572,7 @@ public class FormTest {
         var date = DataHelper.genDate(true);
         var card = new DataHelper.Card(
                 APPROVED_CARD,
-                date.getYear(), DataHelper.genCyrillStr(),
+                date.getYear(), date.getMonth(),
                 DataHelper.genValidHolder(), DataHelper.genLongCVC());
         ApiHelper.sendCard(card);
     }
@@ -583,7 +583,7 @@ public class FormTest {
         var date = DataHelper.genDate(true);
         var card = new DataHelper.Card(
                 APPROVED_CARD,
-                date.getYear(), DataHelper.genCyrillStr(),
+                date.getYear(), date.getMonth(),
                 DataHelper.genValidHolder(), DataHelper.genShortCVC());
         ApiHelper.sendCard(card);
     }
@@ -594,7 +594,7 @@ public class FormTest {
         var date = DataHelper.genDate(true);
         var card = new DataHelper.Card(
                 APPROVED_CARD,
-                date.getYear(), DataHelper.genCyrillStr(),
+                date.getYear(), date.getMonth(),
                 DataHelper.genValidHolder(), DataHelper.genSpeсChars());
         ApiHelper.sendCard(card);
     }
@@ -605,7 +605,7 @@ public class FormTest {
         var date = DataHelper.genDate(true);
         var card = new DataHelper.Card(
                 APPROVED_CARD,
-                date.getYear(), DataHelper.genCyrillStr(),
+                date.getYear(), date.getMonth(),
                 DataHelper.genValidHolder(), DataHelper.genLatinStr(2, 2));
         ApiHelper.sendCard(card);
     }
@@ -616,7 +616,7 @@ public class FormTest {
         var date = DataHelper.genDate(true);
         var card = new DataHelper.Card(
                 APPROVED_CARD,
-                date.getYear(), DataHelper.genCyrillStr(),
+                date.getYear(), date.getMonth(),
                 DataHelper.genValidHolder(), DataHelper.genCyrillStr());
         ApiHelper.sendCard(card);
     }
@@ -627,7 +627,7 @@ public class FormTest {
         var date = DataHelper.genDate(false);
         var card = new DataHelper.Card(
                 APPROVED_CARD,
-                date.getYear(), DataHelper.genCyrillStr(),
+                date.getYear(), date.getMonth(),
                 DataHelper.genValidHolder(), DataHelper.genValidCVC());
         ApiHelper.failSend(card);
         assertEquals("DECLINED", SQLHelper.getStatus());
